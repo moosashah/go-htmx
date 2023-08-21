@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"text/template"
-	"time"
+
+	"github.com/moosashah/go-htmx/pkg/database"
 )
 
 type Film struct {
@@ -14,28 +16,38 @@ type Film struct {
 
 func h1(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("public/views/index.html"))
-	films := map[string][]Film{
-		"Films": {
-			{Title: "foo1", Director: "bar1"},
-			{Title: "foo2", Director: "bar2"},
-			{Title: "foo3", Director: "bar3"},
-		},
+
+	rows, _ := database.Db.Query("SELECT * FROM movies")
+	defer rows.Close()
+
+	data := []Film{}
+	for rows.Next() {
+		i := Film{}
+		rows.Scan(&i.Title, &i.Director)
+		data = append(data, i)
 	}
-	tmpl.Execute(w, films)
+
+	tmpl.Execute(w, data)
 }
 
 func handleAddFilm(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(1 * time.Second)
 	title := r.PostFormValue("title")
 	director := r.PostFormValue("director")
+	database.Db.Exec("INSERT INTO movies VALUES(?,?);", title, director)
+
 	tmpl := template.Must(template.ParseFiles("public/views/index.html"))
 	tmpl.ExecuteTemplate(w, "film-list-element", Film{Title: title, Director: director})
 }
 
 func main() {
+	url := "movies.db"
+	database.InitDB(url)
 
 	http.HandleFunc("/", h1)
 	http.HandleFunc("/add-film", handleAddFilm)
 
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	port := ":8000"
+
+	fmt.Printf("Running server on %s", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
