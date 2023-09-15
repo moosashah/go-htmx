@@ -1,0 +1,22 @@
+{{block "todos" .}}
+<div id="app">
+  <a href="/todos/create">Create todo</a>
+  {{ template "todos-list" .}}
+</div>
+{{end}} {{block "todos-list" .}}
+<div id="todos" class="">
+  <div class="">
+    <div>Select</div>
+    <div>Task</div>
+    <div>Completed</div>
+    <div>Delete</div>
+  </div>
+  {{range .Todos}}
+  <div>
+    <div>
+      <input type="" />
+    </div>
+  </div>
+  {{end}}
+</div>
+{{end}}

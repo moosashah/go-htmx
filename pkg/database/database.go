@@ -23,3 +23,19 @@ func InitDB(url string) error {
 
 	return nil
 }
+
+func InitTodosDB(url string) error {
+	db, err := sql.Open("sqlite3", url)
+
+	if err != nil {
+		return err
+	}
+	db.Exec(`CREATE TABLE IF NOT EXISTS todos (
+		context TEXT NOT NULL,
+		completed INTEGER NOT Null
+	)`)
+
+	Db = db
+
+	return nil
+}

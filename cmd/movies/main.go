@@ -15,7 +15,7 @@ type Film struct {
 }
 
 func h1(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("public/views/index.html"))
+	tmpl := template.Must(template.ParseFiles("public/views/movies/index.html"))
 
 	rows, _ := database.Db.Query("SELECT * FROM movies")
 	defer rows.Close()
@@ -40,7 +40,7 @@ func handleAddFilm(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	url := "movies.db"
+	url := "tmp/movies.db"
 	database.InitDB(url)
 
 	http.HandleFunc("/", h1)
